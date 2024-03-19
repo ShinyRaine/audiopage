@@ -11,11 +11,15 @@ import TabPanel from '@mui/lab/TabPanel';
 import { getAudio } from './api';
 import FeedItem from './components/feedItem';
 import { DataInterface } from './types';
+import AudioPlayer from './components/audioPlayer';
+import Transcript from './components/transcrips';
 
 function App() {
   const [value, setValue] = useState('EarningsCall');
-  const [earningsCallData, setEarningsCallData] = useState<DataInterface[]|null>(null);
-  const [podcastsData, setPodcastsData] = useState<DataInterface[]|null>(null);
+  const [earningsCallData, setEarningsCallData] = useState<DataInterface[]>();
+  const [podcastsData, setPodcastsData] = useState<DataInterface[]>();
+  const [currentAudio, setCurrentAudio] = useState<DataInterface>();
+  const [showTranscript, setShowTranscript] = useState(false);
   
 
   useEffect(() => {
@@ -29,11 +33,28 @@ function App() {
     setPodcastsData(data.filter(item => item.audio_type === 'POD'))
   }, [])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+  const handleToggleTranscript = useCallback(() => {
+    setShowTranscript(!showTranscript)
+  }, [showTranscript])
+
+  const listStyle = {
+    p: 0,
+    overflow: 'auto',
+    transition: 'height 0.5s'
+  }
   return (
-    <Container sx={{width: '100vw'}}>
+    <Container sx={{
+      width: '100vw',
+      height: '100vh',
+      p: 0,
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       <Paper
       component="form"
       sx={{ m: '10px 0 0', display: 'flex', alignItems: 'center'}}
@@ -47,21 +68,28 @@ function App() {
         </IconButton>
       </Paper>
       <TabContext value={value}>
-        <TabList onChange={handleChange}>
+        <TabList onChange={handleTabChange}>
           <Tab label="Podcasts" value="Podcasts" sx={{flexGrow: 1}} />
           <Tab label="Earnings Call" value="EarningsCall" sx={{flexGrow: 1}} />
         </TabList>
-        <TabPanel value="Podcasts" sx={{ p: 0 }}>
+        <TabPanel value="Podcasts" sx={listStyle} style={{height: showTranscript ? 0 : 'auto'}}>
           {podcastsData && podcastsData.map(item => (
-            <FeedItem key={item.id} title={item.title} />
+            <FeedItem key={item.id} title={item.title} onClick={() => setCurrentAudio(item)} />
           ))}
         </TabPanel>
-        <TabPanel value="EarningsCall" sx={{ p: 0 }}>
+        <TabPanel value="EarningsCall" sx={listStyle} style={{height: showTranscript ? 0 : 'auto'}}>
           {earningsCallData && earningsCallData.map(item => (
-            <FeedItem key={item.id} title={item.title} />
+            <FeedItem key={item.id} title={item.title} onClick={() => setCurrentAudio(item)} />
           ))}
         </TabPanel>
       </TabContext>
+      <Transcript visible={showTranscript} data={currentAudio?.transcript} />
+      <AudioPlayer
+        visible={!!currentAudio}
+        data={currentAudio}
+        showDetail={showTranscript}
+        handleClickCollapseBtn={handleToggleTranscript}
+      />
     </Container>
   );
 }

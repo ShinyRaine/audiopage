@@ -17,11 +17,13 @@ const cardStyle = {
 }
 
 export default function FeedItem(props: {
-  title: string
+  title: string,
+  onClick: React.MouseEventHandler
 }) {
+  const {title, onClick} = props
   return (
-    <Card variant="outlined" sx={cardStyle}>
-      {props.title}
+    <Card variant="outlined" sx={cardStyle} onClick={onClick}>
+      {title}
       <PlayArrowIcon />
     </Card>
   );
