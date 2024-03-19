@@ -20,18 +20,17 @@ function App() {
   const [podcastsData, setPodcastsData] = useState<DataInterface[]>();
   const [currentAudio, setCurrentAudio] = useState<DataInterface>();
   const [showTranscript, setShowTranscript] = useState(false);
-  
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   const getData = useCallback(async () => {
     const data = await getAudio();
     console.log(data)
     setEarningsCallData(data.filter(item => item.audio_type === 'EC'));
     setPodcastsData(data.filter(item => item.audio_type === 'POD'))
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -83,12 +82,11 @@ function App() {
           ))}
         </TabPanel>
       </TabContext>
-      <Transcript visible={showTranscript} data={currentAudio?.transcript} />
       <AudioPlayer
         visible={!!currentAudio}
         data={currentAudio}
         showDetail={showTranscript}
-        handleClickCollapseBtn={handleToggleTranscript}
+        onClickCollapseBtn={handleToggleTranscript}
       />
     </Container>
   );

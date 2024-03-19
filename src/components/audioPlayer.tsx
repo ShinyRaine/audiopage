@@ -7,18 +7,26 @@ import { DataInterface } from '../types';
 import { useCallback, useRef, useState } from 'react';
 import { ButtonBase, Typography } from '@mui/material';
 import { KeyboardArrowDown, Pause, PlayArrow } from '@mui/icons-material';
+import Transcript from './transcrips';
+import { timeFormat } from '../utils';
 
 export default function AudioPlayer(props: {
   visible: boolean,
   showDetail: boolean,
-  handleClickCollapseBtn: React.MouseEventHandler,
+  onClickCollapseBtn: React.MouseEventHandler,
   data?: DataInterface
 }) {
-  const {visible, data, showDetail, handleClickCollapseBtn} = props;
+  const {visible, data, showDetail, onClickCollapseBtn} = props;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [showTranscript, setShowTranscript] = useState(false);
+
+  const handleClickCollapseBtn = useCallback((e: React.MouseEvent) => {
+    setShowTranscript(!showTranscript);
+    onClickCollapseBtn(e);
+  }, [showTranscript, onClickCollapseBtn])
 
   const handleClickPlayBtn = useCallback(() => {
     if(audioRef.current) {
@@ -30,8 +38,19 @@ export default function AudioPlayer(props: {
     }
   }, [audioRef, isPlaying])
 
+  const handleTimeChange = useCallback((time: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = time
+  }, [audioRef])
+
   return (
     <>
+      <Transcript
+        visible={showTranscript}
+        data={data?.transcript}
+        currentTime={currentTime}
+        changeTime={handleTimeChange}
+      />
       <Box>
         <Slide direction="up" in={visible} mountOnEnter unmountOnExit>
           <div>
@@ -82,9 +101,4 @@ export default function AudioPlayer(props: {
     </>
 
   );
-}
-
-function timeFormat(s?: number) {
-  if (!s) return '0:0';
-  return `${Math.floor(s / 60)}:${(s % 60).toFixed()}`;
 }

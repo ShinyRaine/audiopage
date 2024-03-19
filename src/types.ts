@@ -16,6 +16,15 @@ export interface TranscriptInterface {
   'q&a': boolean;
   topics: { 
       name: string;
-      en_name: string
-    }[]
+      en_name: string;
+      topic_id: string;
+  }[]
+}
+
+export interface TopicInterface {
+  start: number;
+  end: number;
+  name: string;
+  en_name: string;
+  topic_id: string;
 }
