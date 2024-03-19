@@ -15,10 +15,11 @@ import AudioPlayer from './components/audioPlayer';
 import Transcript from './components/transcrips';
 
 function App() {
-  const [value, setValue] = useState('EarningsCall');
+  const [tab, setTab] = useState('EarningsCall');
   const [earningsCallData, setEarningsCallData] = useState<DataInterface[]>();
   const [podcastsData, setPodcastsData] = useState<DataInterface[]>();
   const [currentAudio, setCurrentAudio] = useState<DataInterface>();
+  const [currentAudioIndex, setCurrentAudioIndex] = useState<number>();
   const [showTranscript, setShowTranscript] = useState(false);
 
   const getData = useCallback(async () => {
@@ -33,12 +34,27 @@ function App() {
   }, [getData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+    setTab(newValue);
   };
 
   const handleToggleTranscript = useCallback(() => {
     setShowTranscript(!showTranscript)
   }, [showTranscript])
+
+  const handleChangeAudio = useCallback((audioData: DataInterface, i?: number) => {
+    setCurrentAudio(audioData);
+    setCurrentAudioIndex(i);
+  }, [])
+
+  const handleSkip = useCallback((index: number) => {
+    if (!currentAudio || !podcastsData || !earningsCallData || currentAudioIndex === undefined) return;
+    if (tab === 'Podcasts') {
+      handleChangeAudio(podcastsData[index], index);
+    }
+    if (tab === 'EarningsCall') {
+      handleChangeAudio(earningsCallData[index], index);
+    }
+  }, [currentAudio, tab, podcastsData, earningsCallData, currentAudioIndex, handleChangeAudio])
 
   const listStyle = {
     p: 0,
@@ -66,19 +82,19 @@ function App() {
           <SearchIcon />
         </IconButton>
       </Paper>
-      <TabContext value={value}>
+      <TabContext value={tab}>
         <TabList onChange={handleTabChange}>
           <Tab label="Podcasts" value="Podcasts" sx={{flexGrow: 1}} />
           <Tab label="Earnings Call" value="EarningsCall" sx={{flexGrow: 1}} />
         </TabList>
         <TabPanel value="Podcasts" sx={listStyle} style={{height: showTranscript ? 0 : 'auto'}}>
-          {podcastsData && podcastsData.map(item => (
-            <FeedItem key={item.id} title={item.title} onClick={() => setCurrentAudio(item)} />
+          {podcastsData && podcastsData.map((item, i) => (
+            <FeedItem key={item.id} title={item.title} onClick={() => handleChangeAudio(item, i)} />
           ))}
         </TabPanel>
         <TabPanel value="EarningsCall" sx={listStyle} style={{height: showTranscript ? 0 : 'auto'}}>
-          {earningsCallData && earningsCallData.map(item => (
-            <FeedItem key={item.id} title={item.title} onClick={() => setCurrentAudio(item)} />
+          {earningsCallData && earningsCallData.map((item, i) => (
+            <FeedItem key={item.id} title={item.title} onClick={() => handleChangeAudio(item, i)} />
           ))}
         </TabPanel>
       </TabContext>
@@ -87,6 +103,8 @@ function App() {
         data={currentAudio}
         showDetail={showTranscript}
         onClickCollapseBtn={handleToggleTranscript}
+        handleSkipNext={() => currentAudioIndex !== undefined && handleSkip(currentAudioIndex + 1)}
+        handleSkipPrev={() => currentAudioIndex !== undefined && handleSkip(currentAudioIndex - 1)}
       />
     </Container>
   );

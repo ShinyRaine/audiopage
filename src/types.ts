@@ -12,7 +12,7 @@ export interface TranscriptInterface {
   start: number;
   end: number;
   speaker: string;
-  sentiment: number
+  sentiment: number;
   'q&a': boolean;
   topics: { 
       name: string;
@@ -27,4 +27,10 @@ export interface TopicInterface {
   name: string;
   en_name: string;
   topic_id: string;
+}
+
+export interface SentimentInterface {
+  start: number;
+  end: number;
+  sentiment: number;
 }

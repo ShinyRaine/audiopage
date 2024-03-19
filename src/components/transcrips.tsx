@@ -55,6 +55,7 @@ export default function Transcript(props: {
               <Typography
                 sx={{
                   m: 1,
+                  cursor: 'pointer',
                   color: currentTime >= item.start && currentTime <= item.end ? '#000' : '#838383'
                 }} key={item.start}
                 onClick={() => changeTime(item.start)}
@@ -70,12 +71,13 @@ export default function Transcript(props: {
                 sx={{
                   display: 'flex',
                   mb: 4,
-                  color: currentTime >= item.start ? '#0F668A' : '#838383'
+                  color: currentTime >= item.start ? '#0F668A' : '#838383',
+                  cursor: 'pointer'
                 }}
                 key={item.topic_id + i}
                 onClick={() => changeTime(item.start)}
               >
-                {currentTime >= item.start ? <CheckCircle /> : <Circle />}
+                {currentTime >= item.start ? <CheckCircle  /> : <Circle />}
                 <Box sx={{ml: 2}}>
                   <Typography><b>{item.name}</b></Typography>
                   <Typography>{timeFormat(item.start)}</Typography>
