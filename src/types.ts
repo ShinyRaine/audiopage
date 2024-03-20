@@ -1,10 +1,10 @@
 export interface DataInterface {
-    id: string;
-    issuer: string;
-    title: string;
-    audio_url: string;
-    audio_type: 'EC' | 'POD';
-    transcript: TranscriptInterface[]
+  id: string;
+  issuer: string;
+  title: string;
+  audio_url: string;
+  audio_type: "EC" | "POD";
+  transcript: TranscriptInterface[];
 }
 
 export interface TranscriptInterface {
@@ -13,12 +13,12 @@ export interface TranscriptInterface {
   end: number;
   speaker: string;
   sentiment: number;
-  'q&a': boolean;
-  topics: { 
-      name: string;
-      en_name: string;
-      topic_id: string;
-  }[]
+  "q&a": boolean;
+  topics: {
+    name: string;
+    en_name: string;
+    topic_id: string;
+  }[];
 }
 
 export interface TopicInterface {
